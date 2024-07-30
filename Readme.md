@@ -1,6 +1,7 @@
 # chrome-string-Button 🌈🔳
 
 chrome-string-Button is a powerful Chrome extension that adds a customizable, colorful button overlay to your browsing experience. Boost your productivity and add a splash of color to your workflow!
+![Screen](https://github.com/avnigashi/chrome-string-Button/blob/main/screen.gif?raw=true)
 
 ## 🚀 Features
 
