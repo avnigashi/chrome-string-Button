@@ -34,6 +34,12 @@ newButtonBtn.textContent = 'New Button';
 newButtonBtn.id = 'new-button-btn';
 buttonContainer.appendChild(newButtonBtn);
 
+// Create the "Auto Create Button" button
+const autoCreateButtonBtn = document.createElement('button');
+autoCreateButtonBtn.textContent = 'Auto Create Button';
+autoCreateButtonBtn.id = 'auto-create-button-btn';
+buttonContainer.appendChild(autoCreateButtonBtn);
+
 let lastFocusedInput = null;
 
 document.addEventListener('focus', (event) => {
@@ -100,6 +106,28 @@ document.getElementById('cancel-button').addEventListener('click', () => {
   addButtonForm.style.display = 'none';
   maximizeOverlay(false, currentSettings);
 });
+
+// Function to create a button from clipboard content
+async function createButtonFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) {
+      createButton(text, text, '#007acc');
+      // Save the new button to storage
+      chrome.storage.sync.get('buttons', (data) => {
+        const buttons = data.buttons || [];
+        buttons.push({ name: text, text, bgColor: '#007acc' });
+        chrome.storage.sync.set({ buttons });
+      });
+    } else {
+      alert('Clipboard is empty.');
+    }
+  } catch (err) {
+    console.error('Failed to read clipboard contents: ', err);
+  }
+}
+
+autoCreateButtonBtn.addEventListener('click', createButtonFromClipboard);
 
 // Load saved buttons from storage
 chrome.storage.sync.get('buttons', (data) => {
@@ -182,7 +210,7 @@ function maximizeOverlay(isHoverMode, settings) {
     if (settings.displayMode === 'sidebar') {
         adjustPageContent(settings.overlayPosition, settings.overlayWidth);
     }
-    minimizeBtn.textContent = '-';
+    minimizeBtn.textContent = '<';
     if (!isHoverMode) {
         chrome.storage.sync.set({ isMinimized: false });
     }

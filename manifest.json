@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "FormFiller Pro",
+  "name": "Chrome String Buttons",
   "version": "1.0",
   "description": "Adds a customizable button list overlay or sidebar with named buttons to web pages",
   "permissions": [
