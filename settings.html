@@ -4,10 +4,10 @@
     <title>Button List Overlay Settings</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
-            background-color: var(--background-color, #ffffff);
-            color: var(--text-color, #000000);
+            background-color: #f9f9f9;
+            color: #333;
         }
         label {
             display: block;
@@ -15,28 +15,30 @@
         }
         input, select {
             margin-bottom: 10px;
-            background-color: var(--input-background-color, #ffffff);
-            color: var(--input-text-color, #000000);
-            border: 1px solid var(--input-border-color, #cccccc);
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
         }
         button {
             margin-top: 20px;
-            background-color: var(--button-background-color, #4CAF50);
-            color: var(--button-text-color, #ffffff);
+            background-color: #007acc;
+            color: #fff;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
         }
         button:hover {
-            opacity: 0.8;
+            background-color: #005f99;
         }
         #buttonList {
             margin-top: 20px;
         }
         .button-item {
-            margin-bottom: 10px;
-        }
-        .radio-group {
             margin-bottom: 10px;
         }
     </style>

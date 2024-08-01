@@ -5,7 +5,7 @@ document.body.appendChild(buttonList);
 
 // Create the minimize button
 const minimizeBtn = document.createElement('button');
-minimizeBtn.textContent = '-';
+minimizeBtn.textContent = '<';
 minimizeBtn.id = 'minimize-btn';
 buttonList.appendChild(minimizeBtn);
 
@@ -20,42 +20,33 @@ addButtonForm.id = 'add-button-form';
 addButtonForm.style.display = 'none'; // Initially hidden
 addButtonForm.innerHTML = `
   <h3>Add New Button</h3>
-  <label for="button-name">Name:</label>
-  <input type="text" id="button-name" placeholder="Button Name">
-  <label for="button-value">Value:</label>
-  <input type="text" id="button-value" placeholder="Button Value">
-  <label for="button-color">Color:</label>
-  <input type="color" id="button-color" value="#4CAF50">
+  <input type="text" id="button-name" placeholder="Name">
+  <input type="text" id="button-value" placeholder="Value">
+  <input type="color" id="button-color" value="#007acc">
   <div style="margin-top: 10px;">
     <button id="save-button">Save</button>
     <button id="cancel-button">Cancel</button>
   </div>
 `;
 buttonContainer.appendChild(addButtonForm);
-
-// Create the "New Button" button
 const newButtonBtn = document.createElement('button');
 newButtonBtn.textContent = 'New Button';
 newButtonBtn.id = 'new-button-btn';
 buttonContainer.appendChild(newButtonBtn);
 
-
-// Variable to store the last focused input element
 let lastFocusedInput = null;
 
-// Event listener to track the last focused input element
 document.addEventListener('focus', (event) => {
   if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
     lastFocusedInput = event.target;
   }
 }, true);
 
-// Function to create a new button
 function createButton(name, text, bgColor) {
   const button = document.createElement('button');
   button.textContent = name;
   button.title = text; // Use title attribute to store the text content
-  button.style.backgroundColor = bgColor || '#4CAF50'; // Default background color
+  button.style.backgroundColor = bgColor || '#007acc'; // Default background color
   button.style.color = '#ffffff'; // Default text color
   button.addEventListener('click', () => {
     if (lastFocusedInput) {
@@ -72,12 +63,12 @@ function createButton(name, text, bgColor) {
   buttonContainer.insertBefore(button, newButtonBtn);
 }
 
-// Event listener for the "New Button" button
 newButtonBtn.addEventListener('click', () => {
   addButtonForm.style.display = 'block';
+  // Ensure the sidebar stays open
+  maximizeOverlay(false, currentSettings);
 });
 
-// Event listener for the "Save" button in the form
 document.getElementById('save-button').addEventListener('click', () => {
   const name = document.getElementById('button-name').value;
   const text = document.getElementById('button-value').value;
@@ -92,23 +83,22 @@ document.getElementById('save-button').addEventListener('click', () => {
       chrome.storage.sync.set({ buttons });
     });
 
-    // Reset the form and hide it
     document.getElementById('button-name').value = '';
     document.getElementById('button-value').value = '';
-    document.getElementById('button-color').value = '#4CAF50';
+    document.getElementById('button-color').value = '#007acc';
     addButtonForm.style.display = 'none';
   } else {
     alert('Please fill out both the name and value fields.');
   }
+  maximizeOverlay(false, currentSettings);
 });
 
-// Event listener for the "Cancel" button in the form
 document.getElementById('cancel-button').addEventListener('click', () => {
-  // Reset the form and hide it
   document.getElementById('button-name').value = '';
   document.getElementById('button-value').value = '';
-  document.getElementById('button-color').value = '#4CAF50';
+  document.getElementById('button-color').value = '#007acc';
   addButtonForm.style.display = 'none';
+  maximizeOverlay(false, currentSettings);
 });
 
 // Load saved buttons from storage
@@ -117,8 +107,12 @@ chrome.storage.sync.get('buttons', (data) => {
   buttons.forEach(button => createButton(button.name, button.text, button.bgColor));
 });
 
+// Variable to store current settings
+let currentSettings = {};
+
 // Function to apply settings
 function applySettings(settings) {
+    currentSettings = settings;
     buttonList.style.position = 'fixed';
     buttonList.style[settings.overlayPosition] = '0';
     buttonList.style.top = '0';
@@ -166,8 +160,8 @@ function resetPageContent() {
     document.body.style.marginRight = '';
 }
 
-// Function to minimize the overlay
 function minimizeOverlay(isHoverMode, settings) {
+    if (addButtonForm.style.display === 'block') return; // Don't minimize if form is open
     buttonContainer.style.display = 'none';
     if (settings.displayMode === 'overlay') {
         buttonList.style.width = '30px';
@@ -176,13 +170,12 @@ function minimizeOverlay(isHoverMode, settings) {
         buttonList.style.width = '10px';
         resetPageContent();
     }
-    minimizeBtn.textContent = '+';
+    minimizeBtn.textContent = '>';
     if (!isHoverMode) {
         chrome.storage.sync.set({ isMinimized: true });
     }
 }
 
-// Function to maximize the overlay
 function maximizeOverlay(isHoverMode, settings) {
     buttonContainer.style.display = 'flex';
     buttonList.style.width = settings.overlayWidth + 'px';
@@ -195,7 +188,6 @@ function maximizeOverlay(isHoverMode, settings) {
     }
 }
 
-// Event listener for the minimize button
 minimizeBtn.addEventListener('click', () => {
     chrome.storage.sync.get(['isMinimized', 'minimizeUntilHover', 'displayMode', 'overlayPosition', 'overlayWidth'], (data) => {
         if (data.minimizeUntilHover) {
@@ -210,7 +202,6 @@ minimizeBtn.addEventListener('click', () => {
     });
 });
 
-// Load and apply settings
 chrome.storage.sync.get({
     displayMode: 'sidebar',
     overlayPosition: 'left',
@@ -223,8 +214,7 @@ chrome.storage.sync.get({
     minimizeUntilHover: true
 }, applySettings);
 
-// Listen for settings changes
-chrome.storage.onChanged.addListener(function(changes, namespace) {
+chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'sync') {
         chrome.storage.sync.get({
             displayMode: 'sidebar',
